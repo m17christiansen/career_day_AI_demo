@@ -1,4 +1,4 @@
-/* Enhanced EmojiGame.css with new layout */
+/* Enhanced EmojiGame.css with Info Panel */
 .emoji-game-wrapper {
     display: flex;
     justify-content: center;
@@ -6,6 +6,7 @@
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
+    position: relative;
   }
   
   .emoji-game-container {
@@ -24,6 +25,35 @@
     flex-direction: column;
     overflow: hidden;
     box-sizing: border-box;
+    position: relative;
+  }
+  
+  /* Info Button */
+  .info-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  
+  .info-button:hover {
+    background: white;
+    color: #667eea;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
   }
   
   /* Reduced title section */
@@ -35,6 +65,7 @@
     animation: pulse 2s infinite;
     flex-shrink: 0;
     padding: 0.5rem 0;
+    padding-right: 60px; /* Make space for info button */
   }
   
   @keyframes pulse {
@@ -509,11 +540,267 @@
     opacity: 0.9;
   }
   
+  /* AI Information Panel */
+  .info-panel {
+    position: fixed;
+    top: 0;
+    right: -60%; /* Hidden by default */
+    width: 60%; /* 60% of screen width */
+    height: 100vh;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    z-index: 1000;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+  }
+  
+  .info-panel.open {
+    right: 0;
+  }
+  
+  .info-panel-content {
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .info-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .info-panel-header h2 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: #60a5fa;
+  }
+  
+  .close-info-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .close-info-button:hover {
+    background: white;
+    color: #1e293b;
+    transform: rotate(90deg);
+  }
+  
+  .info-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .ai-section {
+    margin-bottom: 2rem;
+  }
+  
+  .ai-section h3 {
+    color: #60a5fa;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .ai-technique {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #60a5fa;
+  }
+  
+  .ai-technique h4 {
+    color: #93c5fd;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .ai-technique p {
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+  }
+  
+  .ai-technique ul {
+    color: #cbd5e1;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  
+  .ai-technique li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+  
+  .emotion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  
+  .emotion-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .emotion-tag.positive {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #86efac;
+  }
+  
+  .emotion-tag.negative {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+  }
+  
+  .emotion-tag.angry {
+    background: rgba(249, 115, 22, 0.2);
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    color: #fdba74;
+  }
+  
+  .emotion-tag.surprised {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #d8b4fe;
+  }
+  
+  .emotion-tag.anxious {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+  }
+  
+  .emotion-tag.excited {
+    background: rgba(234, 179, 8, 0.2);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    color: #fde047;
+  }
+  
+  .emotion-tag.confused {
+    background: rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    color: #cbd5e1;
+  }
+  
+  .emotion-tag.tired {
+    background: rgba(107, 114, 128, 0.2);
+    border: 1px solid rgba(107, 114, 128, 0.4);
+    color: #9ca3af;
+  }
+  
+  .accuracy-note {
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .accuracy-note h4 {
+    color: #86efac;
+    margin-bottom: 0.8rem;
+  }
+  
+  .accuracy-note p {
+    color: #bbf7d0;
+    margin: 0;
+  }
+  
+  .info-panel-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .tech-stack {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+  }
+  
+  .tech-stack strong {
+    color: #60a5fa;
+  }
+  
+  /* Overlay */
+  .info-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Scrollbar styling */
+  .info-panel-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .info-panel-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+  
+  .info-panel-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  .info-panel-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
   /* Responsive design */
   @media (max-width: 1024px) {
     .main-layout {
       grid-template-columns: 250px 1fr 250px;
       gap: 1rem;
+    }
+    
+    .info-panel {
+      width: 80%; /* Wider on tablets */
     }
   }
   
@@ -555,6 +842,18 @@
     .right-sidebar {
       order: 2;
     }
+    
+    .info-panel {
+      width: 90%; /* Almost full width on mobile */
+    }
+    
+    .info-panel-header h2 {
+      font-size: 1.5rem;
+    }
+    
+    .emotion-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   
   @media (max-width: 480px) {
@@ -577,32 +876,25 @@
       margin-bottom: 0.5rem;
       padding: 0.3rem 0;
     }
-  }
-  
-  /* Scrollbar styling */
-  .center-game-area::-webkit-scrollbar,
-  .right-sidebar::-webkit-scrollbar,
-  .history-list::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .center-game-area::-webkit-scrollbar-track,
-  .right-sidebar::-webkit-scrollbar-track,
-  .history-list::-webkit-scrollbar-track {
-    background: rgba(102, 126, 234, 0.1);
-    border-radius: 3px;
-  }
-  
-  .center-game-area::-webkit-scrollbar-thumb,
-  .right-sidebar::-webkit-scrollbar-thumb,
-  .history-list::-webkit-scrollbar-thumb {
-    background: rgba(102, 126, 234, 0.3);
-    border-radius: 3px;
-  }
-  
-  .center-game-area::-webkit-scrollbar-thumb:hover,
-  .right-sidebar::-webkit-scrollbar-thumb:hover,
-  .history-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 126, 234, 0.5);
+    
+    .info-button {
+      top: 10px;
+      right: 10px;
+      width: 35px;
+      height: 35px;
+      font-size: 1rem;
+    }
+    
+    .info-panel {
+      width: 95%;
+    }
+    
+    .info-panel-content {
+      padding: 1.5rem;
+    }
+    
+    .ai-technique {
+      padding: 1rem;
+    }
   }
   

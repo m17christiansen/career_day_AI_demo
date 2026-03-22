@@ -16,6 +16,7 @@ const GridGame = () => {
   const [gameOverMessage, setGameOverMessage] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
   const [difficulty, setDifficulty] = useState('easy');
+  const [showInfoPane, setShowInfoPane] = useState(false);
 
   // Simple SVG Icons
   const PlayerIcon = () => (
@@ -84,6 +85,21 @@ const GridGame = () => {
   const ArrowRightIcon = () => (
     <svg viewBox="0 0 24 24" className="arrow-icon">
       <path d="M16 12l-6 6V6l6 6z" fill="currentColor" />
+    </svg>
+  );
+
+  // Info Icon
+  const InfoIcon = () => (
+    <svg viewBox="0 0 24 24" className="info-icon">
+      <circle cx="12" cy="12" r="10" fill="currentColor" />
+      <text x="12" y="16" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">i</text>
+    </svg>
+  );
+
+  // Close Icon
+  const CloseIcon = () => (
+    <svg viewBox="0 0 24 24" className="close-icon">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor" />
     </svg>
   );
 
@@ -436,6 +452,11 @@ const GridGame = () => {
     setDifficulty(newDifficulty);
   };
 
+  // Toggle info pane
+  const toggleInfoPane = () => {
+    setShowInfoPane(!showInfoPane);
+  };
+
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (turn !== 'player') return;
@@ -508,169 +529,252 @@ const GridGame = () => {
   return (
     <div className="grid-game-container">
       {showConfetti && <Confetti />}
-      <div className="grid-game">
-        <div className="game-controls">
-          <h2>Grid Game</h2>
-          
-          <div className="difficulty-controls">
-            <div className="difficulty-label">Difficulty:</div>
-            <div className="difficulty-buttons">
-              <button 
-                className={`difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
-                onClick={() => handleDifficultyChange('easy')}
-              >
-                Easy
-              </button>
-              <button 
-                className={`difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
-                onClick={() => handleDifficultyChange('medium')}
-              >
-                Medium
-              </button>
-              <button 
-                className={`difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
-                onClick={() => handleDifficultyChange('hard')}
-              >
-                Hard
-              </button>
-            </div>
-            <div className="difficulty-description">
-              {difficulty === 'easy' && 'Computer moves randomly'}
-              {difficulty === 'medium' && 'Computer always tries to get closer'}
-              {difficulty === 'hard' && 'Three smart computers chase you!'}
-            </div>
-          </div>
-          
-          <div className="status-container">
-            {gameOverMessage ? (
-              <div className="game-over-message">
-                <p className="game-over-text">{gameOverMessage}</p>
-              </div>
-            ) : (
-              <>
-                <p className={`status ${gameStatus}`}>
-                  Status: <span className="status-text">
-                    {gameStatus === 'playing' ? 'Playing' : 'Game Over'}
-                  </span>
-                </p>
-                <p className="turn-info">
-                  Turn: <span className="turn-text">
-                    {turn === 'player' ? 'Your Turn' : 'Computer Thinking...'}
-                  </span>
-                </p>
-                <p className="difficulty-info">
-                  Difficulty: <span className="difficulty-text">{difficulty.toUpperCase()}</span>
-                </p>
-              </>
-            )}
-          </div>
-          
-          <div className="arrow-controls">
-            <div className="arrow-controls-label">Arrow Controls:</div>
-            <div className="arrow-grid">
-              <div className="arrow-row">
-                <button 
-                  className="arrow-btn up-btn"
-                  onClick={() => handleArrowClick('up')}
-                  disabled={turn !== 'player' || gameStatus !== 'playing'}
-                >
-                  <ArrowUpIcon />
-                </button>
-              </div>
-              <div className="arrow-row middle-row">
-                <button 
-                  className="arrow-btn left-btn"
-                  onClick={() => handleArrowClick('left')}
-                  disabled={turn !== 'player' || gameStatus !== 'playing'}
-                >
-                  <ArrowLeftIcon />
-                </button>
-                <button 
-                  className="arrow-btn down-btn"
-                  onClick={() => handleArrowClick('down')}
-                  disabled={turn !== 'player' || gameStatus !== 'playing'}
-                >
-                  <ArrowDownIcon />
-                </button>
-                <button 
-                  className="arrow-btn right-btn"
-                  onClick={() => handleArrowClick('right')}
-                  disabled={turn !== 'player' || gameStatus !== 'playing'}
-                >
-                  <ArrowRightIcon />
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <button onClick={initializeGame} className="restart-btn">
-            Restart Game Now
+      
+      {/* Info Button */}
+      <button className="info-button" onClick={toggleInfoPane}>
+        <InfoIcon />
+      </button>
+      
+      {/* Info Pane */}
+      <div className={`info-pane ${showInfoPane ? 'open' : ''}`}>
+        <div className="info-pane-header">
+          <h2>AI Behind This Game</h2>
+          <button className="close-button" onClick={toggleInfoPane}>
+            <CloseIcon />
           </button>
         </div>
         
-        <div className="grid-container">
-          <div className="grid">
-            {grid.map((row, y) => (
-              <div key={y} className="grid-row">
-                {row.map((_, x) => renderCell(x, y))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="instructions">
-          <h3>How to Play:</h3>
-          <ul>
-            <li>Use arrow keys or buttons to move your character</li>
-            <li>Reach the <span className="finish-text">Finish</span> (green) to win</li>
-            <li>Start from the <span className="start-text">Start</span> (red) position</li>
-            <li>Avoid the computers and obstacles</li>
-            <li>Computer moves first each round</li>
-            <li>Game automatically resets after win/lose</li>
-          </ul>
-          
-          <div className="difficulty-info-section">
-            <h4>Difficulty Levels:</h4>
+        <div className="info-pane-content">
+          <div className="ai-section">
+            <h3>Pathfinding Algorithm</h3>
+            <p>The computer opponents use a <strong>Manhattan Distance</strong> heuristic to chase the player:</p>
             <ul>
-              <li><strong>Easy:</strong> Computer moves randomly (avoids obstacles)</li>
-              <li><strong>Medium:</strong> Computer always tries to get closer to you</li>
-              <li><strong>Hard:</strong> Three smart computers chase you simultaneously!</li>
+              <li><strong>Distance Calculation:</strong> |x1 - x2| + |y1 - y2|</li>
+              <li><strong>Movement Logic:</strong> Computers evaluate all possible moves each turn</li>
+              <li><strong>Obstacle Avoidance:</strong> Paths around obstacles automatically</li>
+              <li><strong>Collision Prevention:</strong> Computers avoid moving into each other</li>
             </ul>
           </div>
           
-          <div className="legend">
-            <h4>Legend:</h4>
-            <div className="legend-item">
-              <PlayerIcon />
-              <span>Player (You)</span>
+          <div className="difficulty-section">
+            <h3>Difficulty Levels Explained</h3>
+            
+            <div className="difficulty-detail">
+              <h4>Easy Mode</h4>
+              <p><strong>AI Behavior:</strong> Random movement with obstacle avoidance</p>
+              <p><strong>Strategy:</strong> Computer moves randomly but won't hit obstacles</p>
             </div>
-            <div className="legend-item">
-              <ComputerIcon />
-              <span>Computer (Red)</span>
+            
+            <div className="difficulty-detail">
+              <h4>Medium Mode</h4>
+              <p><strong>AI Behavior:</strong> Greedy pathfinding towards player</p>
+              <p><strong>Strategy:</strong> Always chooses moves that reduce distance to player</p>
+              <p><strong>Algorithm:</strong> Prioritizes moves that decrease Manhattan distance</p>
             </div>
-            {difficulty === 'hard' && (
-              <>
-                <div className="legend-item">
-                  <Computer2Icon />
-                  <span>Computer (Orange)</span>
+            
+            <div className="difficulty-detail">
+              <h4>Hard Mode</h4>
+              <p><strong>AI Behavior:</strong> Coordinated multi-agent pursuit</p>
+              <p><strong>Strategy:</strong> Three computers with coordinated movement</p>
+              <p><strong>Features:</strong>
+                <ul>
+                  <li>Simultaneous movement planning</li>
+                  <li>Collision avoidance between computers</li>
+                  <li>Surrounding tactics</li>
+                  <li>Fallback to random movement when blocked</li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          
+          <div className="technical-section">
+            <h3>Technical Implementation</h3>
+            <p><strong>State Management:</strong> React hooks for game state and AI decisions</p>
+            <p><strong>Move Validation:</strong> Checks for boundaries, obstacles, and collisions</p>
+            <p><strong>Turn-based System:</strong> Alternating player/computer turns</p>
+            <p><strong>Real-time Updates:</strong> 500ms delay for computer "thinking"</p>
+          </div>
+          
+          <div className="strategy-tips">
+            <h3>Player Strategy Tips</h3>
+            <ul>
+              <li>Use obstacles as shields against computers</li>
+              <li>Plan moves several steps ahead</li>
+              <li>In hard mode, watch for coordinated movements</li>
+              <li>Use the grid edges to limit approach directions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      {/* Overlay for when info pane is open */}
+      {showInfoPane && <div className="overlay" onClick={toggleInfoPane}></div>}
+      
+      <div className="horizontal-scroll-container">
+        <div className="grid-game">
+          <div className="game-controls">
+            <h2>Grid Game</h2>
+            
+            <div className="difficulty-controls">
+              <div className="difficulty-label">Difficulty:</div>
+              <div className="difficulty-buttons">
+                <button 
+                  className={`difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyChange('easy')}
+                >
+                  Easy
+                </button>
+                <button 
+                  className={`difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyChange('medium')}
+                >
+                  Medium
+                </button>
+                <button 
+                  className={`difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyChange('hard')}
+                >
+                  Hard
+                </button>
+              </div>
+              <div className="difficulty-description">
+                {difficulty === 'easy' && 'Computer moves randomly'}
+                {difficulty === 'medium' && 'Computer always tries to get closer'}
+                {difficulty === 'hard' && 'Three smart computers chase you!'}
+              </div>
+            </div>
+            
+            <div className="status-container">
+              {gameOverMessage ? (
+                <div className="game-over-message">
+                  <p className="game-over-text">{gameOverMessage}</p>
                 </div>
-                <div className="legend-item">
-                  <Computer3Icon />
-                  <span>Computer (Purple)</span>
+              ) : (
+                <>
+                  <p className={`status ${gameStatus}`}>
+                    Status: <span className="status-text">
+                      {gameStatus === 'playing' ? 'Playing' : 'Game Over'}
+                    </span>
+                  </p>
+                  <p className="turn-info">
+                    Turn: <span className="turn-text">
+                      {turn === 'player' ? 'Your Turn' : 'Computer Thinking...'}
+                    </span>
+                  </p>
+                  <p className="difficulty-info">
+                    Difficulty: <span className="difficulty-text">{difficulty.toUpperCase()}</span>
+                  </p>
+                </>
+              )}
+            </div>
+            
+            <div className="arrow-controls">
+              <div className="arrow-controls-label">Arrow Controls:</div>
+              <div className="arrow-grid">
+                <div className="arrow-row">
+                  <button 
+                    className="arrow-btn up-btn"
+                    onClick={() => handleArrowClick('up')}
+                    disabled={turn !== 'player' || gameStatus !== 'playing'}
+                  >
+                    <ArrowUpIcon />
+                  </button>
                 </div>
-              </>
-            )}
-            <div className="legend-item">
-              <ObstacleIcon />
-              <span>Obstacle (Blocked)</span>
+                <div className="arrow-row middle-row">
+                  <button 
+                    className="arrow-btn left-btn"
+                    onClick={() => handleArrowClick('left')}
+                    disabled={turn !== 'player' || gameStatus !== 'playing'}
+                  >
+                    <ArrowLeftIcon />
+                  </button>
+                  <button 
+                    className="arrow-btn down-btn"
+                    onClick={() => handleArrowClick('down')}
+                    disabled={turn !== 'player' || gameStatus !== 'playing'}
+                  >
+                    <ArrowDownIcon />
+                  </button>
+                  <button 
+                    className="arrow-btn right-btn"
+                    onClick={() => handleArrowClick('right')}
+                    disabled={turn !== 'player' || gameStatus !== 'playing'}
+                  >
+                    <ArrowRightIcon />
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="legend-item">
-              <div className="legend-color start-color"></div>
-              <span>Start Position</span>
+            
+            <button onClick={initializeGame} className="restart-btn">
+              Restart Game Now
+            </button>
+          </div>
+          
+          <div className="grid-container">
+            <div className="grid">
+              {grid.map((row, y) => (
+                <div key={y} className="grid-row">
+                  {row.map((_, x) => renderCell(x, y))}
+                </div>
+              ))}
             </div>
-            <div className="legend-item">
-              <div className="legend-color finish-color"></div>
-              <span>Finish Position</span>
+          </div>
+
+          <div className="instructions">
+            <h3>How to Play:</h3>
+            <ul>
+              <li>Use arrow keys or buttons to move your character</li>
+              <li>Reach the <span className="finish-text">Finish</span> (green) to win</li>
+              <li>Start from the <span className="start-text">Start</span> (red) position</li>
+              <li>Avoid the computers and obstacles</li>
+              <li>Computer moves first each round</li>
+              <li>Game automatically resets after win/lose</li>
+            </ul>
+            
+            <div className="difficulty-info-section">
+              <h4>Difficulty Levels:</h4>
+              <ul>
+                <li><strong>Easy:</strong> Computer moves randomly (avoids obstacles)</li>
+                <li><strong>Medium:</strong> Computer always tries to get closer to you</li>
+                <li><strong>Hard:</strong> Three smart computers chase you simultaneously!</li>
+              </ul>
+            </div>
+            
+            <div className="legend">
+              <h4>Legend:</h4>
+              <div className="legend-item">
+                <PlayerIcon />
+                <span>Player (You)</span>
+              </div>
+              <div className="legend-item">
+                <ComputerIcon />
+                <span>Computer (Red)</span>
+              </div>
+              {difficulty === 'hard' && (
+                <>
+                  <div className="legend-item">
+                    <Computer2Icon />
+                    <span>Computer (Orange)</span>
+                  </div>
+                  <div className="legend-item">
+                    <Computer3Icon />
+                    <span>Computer (Purple)</span>
+                  </div>
+                </>
+              )}
+              <div className="legend-item">
+                <ObstacleIcon />
+                <span>Obstacle (Blocked)</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color start-color"></div>
+                <span>Start Position</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color finish-color"></div>
+                <span>Finish Position</span>
+              </div>
             </div>
           </div>
         </div>

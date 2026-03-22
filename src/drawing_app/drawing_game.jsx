@@ -15,6 +15,9 @@ function DrawingGame() {
   const [selectedIdea, setSelectedIdea] = useState('');
   const [currentSuggestion, setCurrentSuggestion] = useState('');
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+  
+  // Info panel state
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   // AI suggestion ideas
   const ideas = [
@@ -45,6 +48,27 @@ function DrawingGame() {
   const getRandomIdea = () => {
     return ideas[Math.floor(Math.random() * ideas.length)];
   };
+
+  // Toggle info panel
+  const toggleInfoPanel = () => {
+    setShowInfoPanel(!showInfoPanel);
+  };
+
+  // Close info panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showInfoPanel && 
+          !e.target.closest('.info-panel') && 
+          !e.target.closest('.info-button')) {
+        setShowInfoPanel(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showInfoPanel]);
 
   // Update canvas size on mount and resize
   useEffect(() => {
@@ -358,6 +382,72 @@ function DrawingGame() {
 
   return (
     <div className="drawing-game-container">
+      {/* Info Button */}
+      <button className="info-button" onClick={toggleInfoPanel}>
+        ℹ️ AI Info
+      </button>
+
+      {/* Info Panel */}
+      <div className={`info-panel ${showInfoPanel ? 'open' : ''}`}>
+        <div className="info-panel-header">
+          <h2>🤖 AI Technologies Behind This Game</h2>
+          <button className="close-button" onClick={toggleInfoPanel}>×</button>
+        </div>
+        
+        <div className="info-panel-content">
+          <section className="ai-section">
+            <h3>🎨 Image Recognition & Detection</h3>
+            <ul>
+              <li><strong>Convolutional Neural Networks (CNNs):</strong> Analyze drawings to identify shapes, objects, and patterns</li>
+              <li><strong>Object Detection Models:</strong> YOLO, Faster R-CNN, or SSD to recognize specific elements in drawings</li>
+              <li><strong>Feature Extraction:</strong> Identify edges, contours, and shapes using algorithms like Canny Edge Detection</li>
+              <li><strong>Image Classification:</strong> Classify drawings into categories (animals, objects, scenes)</li>
+              <li><strong>Similarity Matching:</strong> Compare user drawings with reference images using embeddings</li>
+            </ul>
+          </section>
+
+          <section className="ai-section">
+            <h3>✨ Generative AI Algorithms</h3>
+            <ul>
+              <li><strong>Stable Diffusion:</strong> Generate high-quality images from text prompts or incomplete drawings</li>
+              <li><strong>DALL-E / Midjourney:</strong> Create detailed artwork based on user sketches and suggestions</li>
+              <li><strong>Generative Adversarial Networks (GANs):</strong> StyleGAN or CycleGAN for artistic style transfer</li>
+              <li><strong>Variational Autoencoders (VAEs):</strong> Learn latent representations of drawings for completion</li>
+              <li><strong>Neural Style Transfer:</strong> Apply artistic styles to user drawings</li>
+            </ul>
+          </section>
+
+          <section className="ai-section">
+            <h3>🧠 Intelligent Features</h3>
+            <ul>
+              <li><strong>Real-time Drawing Analysis:</strong> Provide feedback as user draws</li>
+              <li><strong>Smart Suggestions:</strong> Context-aware idea generation based on current drawing</li>
+              <li><strong>Drawing Completion:</strong> Fill in missing parts based on learned patterns</li>
+              <li><strong>Color Palette Suggestions:</strong> Recommend colors based on drawing content</li>
+              <li><strong>Skill Assessment:</strong> Provide difficulty-appropriate challenges</li>
+            </ul>
+          </section>
+
+          <section className="ai-section">
+            <h3>🔧 Technical Implementation</h3>
+            <ul>
+              <li><strong>TensorFlow.js / PyTorch:</strong> Run AI models directly in browser</li>
+              <li><strong>Canvas API:</strong> Real-time drawing processing</li>
+              <li><strong>WebGL Acceleration:</strong> GPU-accelerated AI inference</li>
+              <li><strong>REST APIs:</strong> Connect to cloud-based AI services</li>
+              <li><strong>WebSockets:</strong> Real-time AI feedback during drawing</li>
+            </ul>
+          </section>
+
+          <div className="info-footer">
+            <p><strong>Current Implementation:</strong> This demo uses pre-generated images. A full implementation would integrate the AI technologies listed above.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Overlay when panel is open */}
+      {showInfoPanel && <div className="info-overlay" onClick={toggleInfoPanel}></div>}
+
       <header className="compact-header">
         <h1>🎨 AI Drawing Game</h1>
         <p>Draw something and let AI help you complete it!</p>
