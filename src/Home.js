@@ -19,6 +19,12 @@ function Home() {
             Go to Grid Game
           </button>
         </Link>
+        <p>AI Emoji Game</p>
+        <Link to="/emoji-game">
+          <button className="drawing-game-button">
+            Go to Emoji Game
+          </button>
+        </Link>
       </div>
     </div>
   );
