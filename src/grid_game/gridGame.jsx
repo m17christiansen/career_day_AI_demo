@@ -8,11 +8,14 @@ const GridGame = () => {
   const [grid, setGrid] = useState([]);
   const [playerPos, setPlayerPos] = useState({ x: 0, y: 0 });
   const [computerPos, setComputerPos] = useState({ x: 15, y: 15 });
+  const [computer2Pos, setComputer2Pos] = useState({ x: 7, y: 7 });
+  const [computer3Pos, setComputer3Pos] = useState({ x: 8, y: 8 });
   const [gameStatus, setGameStatus] = useState('playing');
   const [turn, setTurn] = useState('computer');
   const [obstacles, setObstacles] = useState([]);
   const [gameOverMessage, setGameOverMessage] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
+  const [difficulty, setDifficulty] = useState('easy');
 
   // Simple SVG Icons
   const PlayerIcon = () => (
@@ -29,6 +32,26 @@ const GridGame = () => {
       <circle cx="9" cy="10" r="1" fill="#f44336" />
       <circle cx="15" cy="10" r="1" fill="#f44336" />
       <rect x="8" y="18" width="8" height="2" fill="#f44336" />
+    </svg>
+  );
+
+  const Computer2Icon = () => (
+    <svg viewBox="0 0 24 24" className="cell-icon">
+      <rect x="4" y="4" width="16" height="12" rx="2" fill="#FF9800" />
+      <rect x="6" y="6" width="12" height="8" fill="#fff" />
+      <circle cx="9" cy="10" r="1" fill="#FF9800" />
+      <circle cx="15" cy="10" r="1" fill="#FF9800" />
+      <rect x="8" y="18" width="8" height="2" fill="#FF9800" />
+    </svg>
+  );
+
+  const Computer3Icon = () => (
+    <svg viewBox="0 0 24 24" className="cell-icon">
+      <rect x="4" y="4" width="16" height="12" rx="2" fill="#9C27B0" />
+      <rect x="6" y="6" width="12" height="8" fill="#fff" />
+      <circle cx="9" cy="10" r="1" fill="#9C27B0" />
+      <circle cx="15" cy="10" r="1" fill="#9C27B0" />
+      <rect x="8" y="18" width="8" height="2" fill="#9C27B0" />
     </svg>
   );
 
@@ -93,13 +116,47 @@ const GridGame = () => {
     );
   };
 
+  // Calculate Manhattan distance
+  const manhattanDistance = (pos1, pos2) => {
+    return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
+  };
+
+  // Check if position is valid (not obstacle, not another computer, within bounds)
+  const isValidPosition = useCallback((x, y, occupiedPositions = []) => {
+    // Check bounds
+    if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
+      return false;
+    }
+    
+    // Check for obstacle
+    if (grid[y] && grid[y][x] === 'obstacle') {
+      return false;
+    }
+    
+    // Check if position is occupied by another computer or player
+    const isOccupied = occupiedPositions.some(pos => pos.x === x && pos.y === y);
+    if (isOccupied) {
+      return false;
+    }
+    
+    return true;
+  }, [grid]);
+
   // Initialize the game
   const initializeGame = useCallback(() => {
     const newGrid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill('empty'));
     
     // Set start and end positions
     newGrid[0][0] = 'player';
-    newGrid[GRID_SIZE - 1][GRID_SIZE - 1] = 'computer';
+    
+    // Set computer positions based on difficulty
+    if (difficulty === 'hard') {
+      newGrid[GRID_SIZE - 1][GRID_SIZE - 1] = 'computer1';
+      newGrid[7][7] = 'computer2';
+      newGrid[8][8] = 'computer3';
+    } else {
+      newGrid[GRID_SIZE - 1][GRID_SIZE - 1] = 'computer';
+    }
     
     // Generate obstacles
     const newObstacles = [];
@@ -110,9 +167,14 @@ const GridGame = () => {
       const x = Math.floor(Math.random() * GRID_SIZE);
       const y = Math.floor(Math.random() * GRID_SIZE);
       
-      if ((x === 0 && y === 0) || (x === GRID_SIZE - 1 && y === GRID_SIZE - 1) ||
-          (x === 1 && y === 0) || (x === 0 && y === 1) ||
-          (x === GRID_SIZE - 2 && y === GRID_SIZE - 1) || (x === GRID_SIZE - 1 && y === GRID_SIZE - 2)) {
+      // Don't place obstacles on start/end positions or where computers are
+      const isOccupied = (x === 0 && y === 0) || 
+        (x === GRID_SIZE - 1 && y === GRID_SIZE - 1) ||
+        (difficulty === 'hard' && ((x === 7 && y === 7) || (x === 8 && y === 8))) ||
+        (x === 1 && y === 0) || (x === 0 && y === 1) ||
+        (x === GRID_SIZE - 2 && y === GRID_SIZE - 1) || (x === GRID_SIZE - 1 && y === GRID_SIZE - 2);
+      
+      if (isOccupied) {
         continue;
       }
       
@@ -127,24 +189,22 @@ const GridGame = () => {
     setObstacles(newObstacles);
     setPlayerPos({ x: 0, y: 0 });
     setComputerPos({ x: GRID_SIZE - 1, y: GRID_SIZE - 1 });
+    
+    if (difficulty === 'hard') {
+      setComputer2Pos({ x: 7, y: 7 });
+      setComputer3Pos({ x: 8, y: 8 });
+    }
+    
     setGameStatus('playing');
     setTurn('computer');
     setGameOverMessage('');
     setShowConfetti(false);
-  }, []);
+  }, [difficulty]);
 
-  // Initialize on mount
+  // Initialize on mount and when difficulty changes
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
-
-  const isValidPosition = (x, y) => {
-    return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && grid[y][x] !== 'obstacle';
-  };
-
-  const manhattanDistance = (pos1, pos2) => {
-    return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
-  };
 
   // Handle game over and reset
   const handleGameOver = useCallback((message, isWin = false) => {
@@ -161,57 +221,167 @@ const GridGame = () => {
     }, 2000);
   }, [initializeGame]);
 
+  // Improved computer AI for different difficulties
+  const getComputerMove = useCallback((currentPos, targetPos, occupiedPositions = [], avoidMovingAway = false) => {
+    const directions = [
+      { dx: 0, dy: -1, name: 'up' }, 
+      { dx: 1, dy: 0, name: 'right' }, 
+      { dx: 0, dy: 1, name: 'down' }, 
+      { dx: -1, dy: 0, name: 'left' }
+    ];
+
+    // Get all valid moves (not obstacles, not occupied by other entities)
+    const validMoves = directions
+      .map(({ dx, dy, name }) => ({
+        x: currentPos.x + dx,
+        y: currentPos.y + dy,
+        name,
+        distance: manhattanDistance({ x: currentPos.x + dx, y: currentPos.y + dy }, targetPos)
+      }))
+      .filter(move => isValidPosition(move.x, move.y, [...occupiedPositions, playerPos]));
+
+    if (validMoves.length === 0) {
+      return null; // No valid moves
+    }
+
+    // For medium/hard difficulty: prioritize moves that get closer
+    if (avoidMovingAway) {
+      const currentDistance = manhattanDistance(currentPos, targetPos);
+      const closerMoves = validMoves.filter(move => move.distance < currentDistance);
+      
+      if (closerMoves.length > 0) {
+        // Choose the move that gets closest
+        const bestMove = closerMoves.reduce((best, current) => 
+          current.distance < best.distance ? current : best
+        );
+        return { x: bestMove.x, y: bestMove.y };
+      }
+      
+      // If no closer moves, try to maintain same distance
+      const sameDistanceMoves = validMoves.filter(move => move.distance === currentDistance);
+      if (sameDistanceMoves.length > 0) {
+        // Randomly choose from same-distance moves
+        const randomIndex = Math.floor(Math.random() * sameDistanceMoves.length);
+        const chosenMove = sameDistanceMoves[randomIndex];
+        return { x: chosenMove.x, y: chosenMove.y };
+      }
+    }
+
+    // For easy difficulty or when no good moves found
+    // Choose randomly from valid moves
+    const randomIndex = Math.floor(Math.random() * validMoves.length);
+    const chosenMove = validMoves[randomIndex];
+    return { x: chosenMove.x, y: chosenMove.y };
+  }, [isValidPosition, playerPos]);
+
   const computerMove = useCallback(() => {
     if (gameStatus !== 'playing' || turn !== 'computer') return;
 
-    const directions = [
-      { dx: 0, dy: -1 }, { dx: 1, dy: 0 }, 
-      { dx: 0, dy: 1 }, { dx: -1, dy: 0 }
-    ];
+    const newGrid = [...grid];
+    let playerCaught = false;
 
-    let bestMove = null;
-    let bestDistance = manhattanDistance(computerPos, playerPos);
-    const shuffledDirections = [...directions].sort(() => Math.random() - 0.5);
-
-    shuffledDirections.forEach(({ dx, dy }) => {
-      const newX = computerPos.x + dx;
-      const newY = computerPos.y + dy;
-
-      if (isValidPosition(newX, newY)) {
-        const newDistance = manhattanDistance({ x: newX, y: newY }, playerPos);
-        if (newDistance < bestDistance || bestMove === null) {
-          bestDistance = newDistance;
-          bestMove = { x: newX, y: newY };
-        }
-      }
-    });
-
-    if (!bestMove) {
-      shuffledDirections.forEach(({ dx, dy }) => {
-        const newX = computerPos.x + dx;
-        const newY = computerPos.y + dy;
-        if (isValidPosition(newX, newY) && !bestMove) {
-          bestMove = { x: newX, y: newY };
+    // For hard difficulty: plan all moves first, then execute
+    if (difficulty === 'hard') {
+      // Get planned moves for all computers
+      const plannedMoves = [];
+      
+      // Plan move for computer 1 (red)
+      const computer1Move = getComputerMove(
+        computerPos, 
+        playerPos,
+        [computer2Pos, computer3Pos], // Avoid other computers
+        true
+      );
+      plannedMoves.push({ 
+        originalPos: computerPos, 
+        move: computer1Move, 
+        type: 'computer1',
+        setter: setComputerPos 
+      });
+      
+      // Plan move for computer 2 (orange) - avoid planned computer1 move
+      const occupiedForComputer2 = [
+        computer3Pos,
+        ...(computer1Move ? [computer1Move] : [computerPos]) // Avoid computer1's new position
+      ];
+      const computer2Move = getComputerMove(
+        computer2Pos, 
+        playerPos,
+        occupiedForComputer2,
+        true
+      );
+      plannedMoves.push({ 
+        originalPos: computer2Pos, 
+        move: computer2Move, 
+        type: 'computer2',
+        setter: setComputer2Pos 
+      });
+      
+      // Plan move for computer 3 (purple) - avoid planned moves of other computers
+      const occupiedForComputer3 = [
+        ...(computer1Move ? [computer1Move] : [computerPos]),
+        ...(computer2Move ? [computer2Move] : [computer2Pos])
+      ];
+      const computer3Move = getComputerMove(
+        computer3Pos, 
+        playerPos,
+        occupiedForComputer3,
+        true
+      );
+      plannedMoves.push({ 
+        originalPos: computer3Pos, 
+        move: computer3Move, 
+        type: 'computer3',
+        setter: setComputer3Pos 
+      });
+      
+      // Execute all planned moves
+      plannedMoves.forEach(({ originalPos, move, type, setter }) => {
+        if (move) {
+          // Clear old position
+          newGrid[originalPos.y][originalPos.x] = 'empty';
+          
+          // Set new position
+          newGrid[move.y][move.x] = type;
+          
+          // Update position state
+          setter(move);
+          
+          // Check if caught player
+          if (move.x === playerPos.x && move.y === playerPos.y) {
+            playerCaught = true;
+          }
         }
       });
-    }
+    } else {
+      // For easy/medium: just move the main computer
+      const occupiedPositions = difficulty === 'medium' ? [] : [];
+      const mainComputerMove = getComputerMove(
+        computerPos, 
+        playerPos,
+        occupiedPositions,
+        difficulty === 'medium' || difficulty === 'hard'
+      );
 
-    if (bestMove) {
-      const newGrid = [...grid];
-      newGrid[computerPos.y][computerPos.x] = 'empty';
-      newGrid[bestMove.y][bestMove.x] = 'computer';
-      
-      setGrid(newGrid);
-      setComputerPos(bestMove);
-
-      // Check if computer caught the player
-      if (bestMove.x === playerPos.x && bestMove.y === playerPos.y) {
-        handleGameOver('Computer caught you! Game resetting...', false);
-      } else {
-        setTurn('player');
+      if (mainComputerMove) {
+        newGrid[computerPos.y][computerPos.x] = 'empty';
+        newGrid[mainComputerMove.y][mainComputerMove.x] = 'computer';
+        setComputerPos(mainComputerMove);
+        
+        if (mainComputerMove.x === playerPos.x && mainComputerMove.y === playerPos.y) {
+          playerCaught = true;
+        }
       }
     }
-  }, [computerPos, playerPos, grid, gameStatus, turn, handleGameOver]);
+
+    setGrid(newGrid);
+
+    if (playerCaught) {
+      handleGameOver('Computer caught you! Game resetting...', false);
+    } else {
+      setTurn('player');
+    }
+  }, [computerPos, computer2Pos, computer3Pos, playerPos, grid, gameStatus, turn, difficulty, getComputerMove, handleGameOver]);
 
   const playerMove = (dx, dy) => {
     if (gameStatus !== 'playing' || turn !== 'player') return;
@@ -219,7 +389,12 @@ const GridGame = () => {
     const newX = playerPos.x + dx;
     const newY = playerPos.y + dy;
 
-    if (isValidPosition(newX, newY)) {
+    // Player can't move onto obstacles or computers
+    const occupiedPositions = difficulty === 'hard' 
+      ? [computerPos, computer2Pos, computer3Pos]
+      : [computerPos];
+    
+    if (isValidPosition(newX, newY, occupiedPositions)) {
       const newGrid = [...grid];
       newGrid[playerPos.y][playerPos.x] = 'empty';
       newGrid[newY][newX] = 'player';
@@ -256,6 +431,11 @@ const GridGame = () => {
     }
   };
 
+  // Handle difficulty change
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
+  };
+
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (turn !== 'player') return;
@@ -279,10 +459,10 @@ const GridGame = () => {
   }, [turn, gameStatus, computerMove]);
 
   const renderCell = (x, y) => {
-    const cellType = grid[y][x];
+    const cellType = grid[y] && grid[y][x];
     let icon = null;
     let label = null;
-    let cellClass = `grid-cell ${cellType}`;
+    let cellClass = `grid-cell ${cellType || 'empty'}`;
 
     // Add special classes for start and finish cells
     if (x === 0 && y === 0) {
@@ -298,7 +478,14 @@ const GridGame = () => {
         icon = <PlayerIcon />;
         break;
       case 'computer':
+      case 'computer1':
         icon = <ComputerIcon />;
+        break;
+      case 'computer2':
+        icon = <Computer2Icon />;
+        break;
+      case 'computer3':
+        icon = <Computer3Icon />;
         break;
       case 'obstacle':
         icon = <ObstacleIcon />;
@@ -324,6 +511,36 @@ const GridGame = () => {
       <div className="grid-game">
         <div className="game-controls">
           <h2>Grid Game</h2>
+          
+          <div className="difficulty-controls">
+            <div className="difficulty-label">Difficulty:</div>
+            <div className="difficulty-buttons">
+              <button 
+                className={`difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
+                onClick={() => handleDifficultyChange('easy')}
+              >
+                Easy
+              </button>
+              <button 
+                className={`difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
+                onClick={() => handleDifficultyChange('medium')}
+              >
+                Medium
+              </button>
+              <button 
+                className={`difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
+                onClick={() => handleDifficultyChange('hard')}
+              >
+                Hard
+              </button>
+            </div>
+            <div className="difficulty-description">
+              {difficulty === 'easy' && 'Computer moves randomly'}
+              {difficulty === 'medium' && 'Computer always tries to get closer'}
+              {difficulty === 'hard' && 'Three smart computers chase you!'}
+            </div>
+          </div>
+          
           <div className="status-container">
             {gameOverMessage ? (
               <div className="game-over-message">
@@ -340,6 +557,9 @@ const GridGame = () => {
                   Turn: <span className="turn-text">
                     {turn === 'player' ? 'Your Turn' : 'Computer Thinking...'}
                   </span>
+                </p>
+                <p className="difficulty-info">
+                  Difficulty: <span className="difficulty-text">{difficulty.toUpperCase()}</span>
                 </p>
               </>
             )}
@@ -404,10 +624,20 @@ const GridGame = () => {
             <li>Use arrow keys or buttons to move your character</li>
             <li>Reach the <span className="finish-text">Finish</span> (green) to win</li>
             <li>Start from the <span className="start-text">Start</span> (red) position</li>
-            <li>Avoid the computer and obstacles</li>
+            <li>Avoid the computers and obstacles</li>
             <li>Computer moves first each round</li>
             <li>Game automatically resets after win/lose</li>
           </ul>
+          
+          <div className="difficulty-info-section">
+            <h4>Difficulty Levels:</h4>
+            <ul>
+              <li><strong>Easy:</strong> Computer moves randomly (avoids obstacles)</li>
+              <li><strong>Medium:</strong> Computer always tries to get closer to you</li>
+              <li><strong>Hard:</strong> Three smart computers chase you simultaneously!</li>
+            </ul>
+          </div>
+          
           <div className="legend">
             <h4>Legend:</h4>
             <div className="legend-item">
@@ -416,8 +646,20 @@ const GridGame = () => {
             </div>
             <div className="legend-item">
               <ComputerIcon />
-              <span>Computer (Enemy)</span>
+              <span>Computer (Red)</span>
             </div>
+            {difficulty === 'hard' && (
+              <>
+                <div className="legend-item">
+                  <Computer2Icon />
+                  <span>Computer (Orange)</span>
+                </div>
+                <div className="legend-item">
+                  <Computer3Icon />
+                  <span>Computer (Purple)</span>
+                </div>
+              </>
+            )}
             <div className="legend-item">
               <ObstacleIcon />
               <span>Obstacle (Blocked)</span>
