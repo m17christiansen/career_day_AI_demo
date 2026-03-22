@@ -1,0 +1,53 @@
+.App-header {
+  background-color: #004c97 !important;
+  padding: 0;
+  color: white;
+  text-align: center;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  height: 100%;
+}
+
+.icon-button {
+  background-color: #004c97;
+  border: #004c97;
+  color: #c8102e;
+  padding: 10px 15px;
+  font-size: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff,
+               1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: 80px; /* Space for button (40px) + 30px spacing + 10px margin */
+}

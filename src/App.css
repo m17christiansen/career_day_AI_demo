@@ -1,0 +1,288 @@
+/* Drawing Game Specific Styles */
+.drawing-game-container {
+  max-width: 80%;
+  margin: 0 auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawing-game-container .compact-header {
+  background: linear-gradient(45deg, #ff6b6b, #ffa502);
+  color: white;
+  text-align: center;
+  padding: 10px 15px;
+  flex-shrink: 0;
+}
+
+.drawing-game-container .compact-header h1 {
+  font-size: 1.8em;
+  margin-bottom: 5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .compact-header p {
+  font-size: 0.9em;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.drawing-game-container .game-area {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.drawing-game-container .compact-tools-panel {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.drawing-game-container .tool-group-row {
+  margin-bottom: 8px;
+}
+
+.drawing-game-container .tool-group-row:last-child {
+  margin-bottom: 0;
+}
+
+.drawing-game-container .tool-group.compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.drawing-game-container .tool-group.compact label {
+  font-weight: bold;
+  margin-bottom: 3px;
+  color: #333;
+  font-size: 0.8em;
+}
+
+.drawing-game-container .tool-group.compact input[type="range"] {
+  width: 100%;
+  margin: 2px 0;
+  height: 6px;
+}
+
+.drawing-game-container .tool-group.compact input[type="color"] {
+  width: 40px;
+  height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.drawing-game-container .tool-group.compact.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.drawing-game-container .tool-group.compact.button-row button {
+  background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  min-width: 100px;
+  font-size: 0.85em;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.drawing-game-container .tool-group.compact.button-row button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .tool-group.compact.button-row button:active {
+  transform: translateY(0);
+}
+
+.drawing-game-container .tool-group.compact.dropdown-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.drawing-game-container .tool-group.compact.dropdown-row select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.85em;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.drawing-game-container .tool-group.compact.dropdown-row select:hover {
+  border-color: #4facfe;
+}
+
+.drawing-game-container .canvas-container {
+  position: relative;
+  border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  flex: 1;
+  min-height: 0;
+}
+
+.drawing-game-container #drawing-canvas {
+  display: block;
+  cursor: crosshair;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.drawing-game-container .suggestion-display.permanent {
+  display: block !important;
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.drawing-game-container .suggestion-display.permanent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .suggestion-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.drawing-game-container .suggestion-content {
+  font-size: 0.8em;
+  line-height: 1.3;
+}
+
+.drawing-game-container .status-bar {
+  background-color: #e9ecef;
+  padding: 8px 15px;
+  text-align: center;
+  font-weight: bold;
+  color: #495057;
+  border-top: 1px solid #dee2e6;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.drawing-game-container .status-bar #status-message {
+  font-size: 0.9em;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .drawing-game-container {
+      max-width: 90%;
+      height: 95vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .drawing-game-container {
+      max-width: 95%;
+      height: 95vh;
+  }
+  
+  .drawing-game-container .compact-header h1 {
+      font-size: 1.5em;
+  }
+  
+  .drawing-game-container .compact-header p {
+      font-size: 0.8em;
+  }
+  
+  .drawing-game-container .tool-group.compact.button-row {
+      flex-direction: column;
+      align-items: center;
+  }
+  
+  .drawing-game-container .tool-group.compact.button-row button {
+      width: 100%;
+      max-width: 200px;
+      padding: 8px 12px;
+  }
+  
+  .drawing-game-container .tool-group.compact.dropdown-row select {
+      max-width: 300px;
+  }
+  
+  .drawing-game-container .suggestion-display.permanent {
+      max-width: 180px;
+      padding: 8px;
+      bottom: 10px;
+      right: 10px;
+  }
+  
+  .drawing-game-container .suggestion-header {
+      font-size: 0.8em;
+  }
+  
+  .drawing-game-container .suggestion-content {
+      font-size: 0.75em;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawing-game-container {
+      max-width: 98%;
+      height: 96vh;
+  }
+  
+  .drawing-game-container .compact-tools-panel {
+      padding: 8px;
+  }
+  
+  .drawing-game-container .tool-group.compact.dropdown-row select {
+      max-width: 250px;
+      font-size: 0.8em;
+      padding: 5px 8px;
+  }
+  
+  .drawing-game-container .tool-group.compact.button-row button {
+      font-size: 0.8em;
+      padding: 6px 10px;
+      min-width: 80px;
+  }
+}

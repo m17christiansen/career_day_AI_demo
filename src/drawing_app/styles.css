@@ -1,0 +1,263 @@
+/* Drawing Game Specific Styles */
+.drawing-game-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.drawing-game-container header {
+    background: linear-gradient(45deg, #ff6b6b, #ffa502);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.drawing-game-container header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.drawing-game-container .game-area {
+    padding: 20px;
+}
+
+/* Updated compact tools panel styling */
+.drawing-game-container .compact-tools-panel {
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.drawing-game-container .tool-group-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.drawing-game-container .tool-group.compact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+}
+
+.drawing-game-container .tool-group.compact.button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    min-width: auto;
+}
+
+.drawing-game-container .tool-group.compact.dropdown-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 300px;
+}
+
+.drawing-game-container .tool-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.drawing-game-container .tool-group input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.drawing-game-container .tool-group input[type="color"] {
+    width: 50px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.drawing-game-container .tool-group button {
+    background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 120px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    white-space: nowrap;
+}
+
+.drawing-game-container .tool-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .tool-group button:active {
+    transform: translateY(0);
+}
+
+.drawing-game-container .tool-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    min-width: 300px;
+    max-width: 100%;
+    text-align: center;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.drawing-game-container .tool-group select:hover {
+    border-color: #4facfe;
+}
+
+.drawing-game-container .canvas-container {
+    position: relative;
+    border: 3px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.drawing-game-container #drawing-canvas {
+    display: block;
+    cursor: crosshair;
+    background-color: white;
+}
+
+  
+
+.drawing-game-container .suggestion-display.permanent {
+    display: block !important;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.drawing-game-container .suggestion-display.permanent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .suggestion-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.drawing-game-container .suggestion-content {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.drawing-game-container .status-bar {
+    background-color: #e9ecef;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    color: #495057;
+    border-top: 2px solid #dee2e6;
+}
+
+.drawing-game-container .status-bar #status-message {
+    font-size: 1.1em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .drawing-game-container {
+        margin: 10px;
+    }
+    
+    .drawing-game-container header h1 {
+        font-size: 2em;
+    }
+    
+    .drawing-game-container .tool-group-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .drawing-game-container .tool-group.compact.button-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .drawing-game-container .tool-group button {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .drawing-game-container .tool-group.compact.dropdown-row {
+        min-width: 250px;
+    }
+    
+    .drawing-game-container .tool-group select {
+        min-width: 250px;
+        max-width: 100%;
+    }
+    
+    .drawing-game-container .suggestion-display.permanent {
+        max-width: 200px;
+        padding: 10px;
+        bottom: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .drawing-game-container .compact-tools-panel {
+        padding: 10px;
+    }
+    
+    .drawing-game-container .tool-group.compact.dropdown-row {
+        min-width: 200px;
+    }
+    
+    .drawing-game-container .tool-group select {
+        min-width: 200px;
+    }
+    
+    .drawing-game-container #drawing-canvas {
+        height: 400px;
+    }
+}
