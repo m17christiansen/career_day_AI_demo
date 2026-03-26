@@ -5,6 +5,7 @@ function DrawingGame() {
   const canvasRef = useRef(null);
   const suggestionDisplayRef = useRef(null);
   const statusMessageRef = useRef(null);
+  const gameAreaRef = useRef(null);
 
   // Drawing variables
   const [isDrawing, setIsDrawing] = useState(false);
@@ -14,10 +15,13 @@ function DrawingGame() {
   const [brushColor, setBrushColor] = useState('#000000');
   const [selectedIdea, setSelectedIdea] = useState('');
   const [currentSuggestion, setCurrentSuggestion] = useState('');
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   
   // Info panel state
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+
+  // Track if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(false);
 
   // AI suggestion ideas
   const ideas = [
@@ -65,46 +69,73 @@ function DrawingGame() {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [showInfoPanel]);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent) || 
+                  window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Update canvas size on mount and resize
   useEffect(() => {
     const updateCanvasSize = () => {
       const container = document.querySelector('.canvas-container');
       if (container) {
-        const maxWidth = Math.min(800, container.clientWidth - 40);
-        const height = Math.min(600, (maxWidth * 600) / 800);
+        // Calculate available space considering the tools panel and other elements
+        const gameArea = gameAreaRef.current;
+        if (!gameArea) return;
         
-        setCanvasSize({ width: maxWidth, height: height });
+        const availableHeight = window.innerHeight - 200; // Account for header, tools, status bar
+        const availableWidth = Math.min(800, gameArea.clientWidth - 40);
+        
+        // Calculate proportional height based on width, but respect available height
+        const proportionalHeight = Math.min(600, (availableWidth * 600) / 800);
+        const finalHeight = Math.min(proportionalHeight, availableHeight);
+        
+        setCanvasSize({ width: availableWidth, height: finalHeight });
         
         const canvas = canvasRef.current;
         if (canvas) {
-          // Set the internal canvas resolution to match the display size
-          canvas.width = maxWidth;
-          canvas.height = height;
-          
-          // Set the display size via CSS
-          canvas.style.width = maxWidth + 'px';
-          canvas.style.height = height + 'px';
+          // Set the internal canvas resolution
+          canvas.width = availableWidth;
+          canvas.height = finalHeight;
           
           // Redraw white background
           const ctx = canvas.getContext('2d');
           ctx.fillStyle = 'white';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Adjust brush size for mobile
+          if (isMobile && brushSize > 20) {
+            setBrushSize(10);
+          }
         }
       }
     };
     
-    updateCanvasSize();
+    // Use setTimeout to ensure DOM is fully rendered
+    setTimeout(updateCanvasSize, 100);
     window.addEventListener('resize', updateCanvasSize);
     
     return () => {
       window.removeEventListener('resize', updateCanvasSize);
     };
-  }, []);
+  }, [isMobile]);
 
   // Initialize with default random idea
   useEffect(() => {
@@ -113,31 +144,38 @@ function DrawingGame() {
     setSelectedIdea(initialIdea);
   }, []);
 
-  // Fixed coordinate calculation function
+  // Enhanced coordinate calculation function for both mouse and touch
   const getCoordinates = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     
     let clientX, clientY;
     
+    // Handle both touch and mouse events
     if (e.type.includes('touch')) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
+      e.preventDefault();
+      
+      const touch = e.touches[0] || e.changedTouches[0];
+      clientX = touch.clientX;
+      clientY = touch.clientY;
     } else {
       clientX = e.clientX;
       clientY = e.clientY;
     }
     
     // Calculate relative position within the canvas
-    // Use the actual canvas dimensions, not scaled coordinates
-    const x = ((clientX - rect.left) / rect.width) * canvas.width;
-    const y = ((clientY - rect.top) / rect.height) * canvas.height;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     
     return { x, y };
   };
 
   const startDrawing = (e) => {
     e.preventDefault();
+    
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const { x, y } = getCoordinates(e);
@@ -156,11 +194,17 @@ function DrawingGame() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
+    // Draw a dot at the starting point for better mobile experience
+    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = brushColor;
+    ctx.fill();
+    
     updateStatus("Drawing in progress...");
   };
 
   const draw = (e) => {
     if (!isDrawing) return;
+    
     e.preventDefault();
     
     const canvas = canvasRef.current;
@@ -182,14 +226,17 @@ function DrawingGame() {
     updateStatus("Great drawing! Use AI buttons to get suggestions or complete your artwork.");
   };
 
+  // Enhanced touch handlers for mobile
   const handleTouchStart = (e) => {
-    e.preventDefault();
     startDrawing(e);
   };
   
   const handleTouchMove = (e) => {
-    e.preventDefault();
     draw(e);
+  };
+
+  const handleTouchEnd = (e) => {
+    stopDrawing();
   };
 
   const clearCanvas = () => {
@@ -203,29 +250,18 @@ function DrawingGame() {
 
   // AI Integration Functions
   const suggestIdea = () => {
-    // Generate a new random idea
     const newIdea = getRandomIdea();
-    
-    // Update both the suggestion display AND the dropdown selection
     setCurrentSuggestion(newIdea);
     setSelectedIdea(newIdea);
-    
-    // Clear canvas when new idea is suggested
     clearCanvas();
-    
-    // Update status
     updateStatus(`AI suggests: ${newIdea}`);
   };
 
   const handleSuggestionClick = () => {
-    // Generate random idea when suggestion box is clicked
     const randomIdea = getRandomIdea();
     setCurrentSuggestion(randomIdea);
-    setSelectedIdea(randomIdea); // Also update the dropdown selection
-    
-    // Clear canvas when new idea is selected
+    setSelectedIdea(randomIdea);
     clearCanvas();
-    
     updateStatus(`AI suggests: ${randomIdea}`);
   };
 
@@ -233,10 +269,7 @@ function DrawingGame() {
     const selectedValue = e.target.value;
     setSelectedIdea(selectedValue);
     setCurrentSuggestion(selectedValue);
-    
-    // Clear canvas when new idea is selected
     clearCanvas();
-    
     updateStatus(`Selected idea: ${selectedValue}`);
   };
 
@@ -246,7 +279,6 @@ function DrawingGame() {
 
     updateStatus("AI is completing your drawing...");
 
-    // Get the image path for the current suggestion
     const imagePath = ideas_dict[currentSuggestion];
     
     if (!imagePath) {
@@ -254,33 +286,26 @@ function DrawingGame() {
       return;
     }
 
-    // Create an image object to load the photo
     const img = new Image();
     
     img.onload = function() {
-      // Clear the canvas
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Calculate dimensions to fit the image while maintaining aspect ratio
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       const imgWidth = img.width;
       const imgHeight = img.height;
       
-      // Calculate scaling to fit the image within the canvas
       const scale = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
       const scaledWidth = imgWidth * scale;
       const scaledHeight = imgHeight * scale;
       
-      // Center the image on the canvas
       const x = (canvasWidth - scaledWidth) / 2;
       const y = (canvasHeight - scaledHeight) / 2;
       
-      // Draw the image on the canvas
       ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
       
-      // Add a text overlay
       ctx.fillStyle = '#4169E1';
       ctx.font = 'bold 20px Arial';
       ctx.textAlign = 'center';
@@ -291,27 +316,20 @@ function DrawingGame() {
     
     img.onerror = function() {
       updateStatus(`Error loading image: ${imagePath}. Please check if the file exists.`);
-      // Fallback to the old completion method if image fails to load
       fallbackCompletion();
     };
     
-    // Start loading the image
     img.src = imagePath;
   };
 
-  // Fallback completion method if image fails to load
   const fallbackCompletion = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    // Get current drawing state
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    // Clear canvas and redraw original drawing
     clearCanvas();
     ctx.putImageData(imageData, 0, 0);
 
-    // Simulate AI completion by adding meaningful elements
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -357,6 +375,8 @@ function DrawingGame() {
   // Set up event listeners
   useEffect(() => {
     const canvas = canvasRef.current;
+    
+    if (!canvas) return;
 
     // Mouse events
     canvas.addEventListener('mousedown', startDrawing);
@@ -365,11 +385,19 @@ function DrawingGame() {
     canvas.addEventListener('mouseout', stopDrawing);
 
     // Touch events for mobile devices
-    canvas.addEventListener('touchstart', handleTouchStart);
-    canvas.addEventListener('touchmove', handleTouchMove);
-    canvas.addEventListener('touchend', stopDrawing);
+    const options = { passive: false };
+    
+    canvas.addEventListener('touchstart', handleTouchStart, options);
+    canvas.addEventListener('touchmove', handleTouchMove, options);
+    canvas.addEventListener('touchend', handleTouchEnd, options);
+    canvas.addEventListener('touchcancel', handleTouchEnd, options);
 
-    // Cleanup event listeners on unmount
+    // Prevent context menu on long press for mobile
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
     return () => {
       canvas.removeEventListener('mousedown', startDrawing);
       canvas.removeEventListener('mousemove', draw);
@@ -378,9 +406,11 @@ function DrawingGame() {
 
       canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', stopDrawing);
+      canvas.removeEventListener('touchend', handleTouchEnd);
+      canvas.removeEventListener('touchcancel', handleTouchEnd);
+      canvas.removeEventListener('contextmenu', (e) => e.preventDefault());
     };
-  }, [isDrawing, brushColor, brushSize]); // Dependencies for the drawing functions
+  }, [isDrawing, brushColor, brushSize]);
 
   return (
     <div className="drawing-game-container">
@@ -455,7 +485,7 @@ function DrawingGame() {
         <p>Draw something and let AI help you complete it!</p>
       </header>
 
-      <div className="game-area">
+      <div className="game-area" ref={gameAreaRef}>
         <div className="compact-tools-panel">
           <div className="tool-group-row">
             <div className="tool-group compact">
@@ -464,7 +494,7 @@ function DrawingGame() {
                 type="range" 
                 id="brush-size" 
                 min="1" 
-                max="50" 
+                max={isMobile ? "30" : "50"}
                 value={brushSize} 
                 onChange={(e) => setBrushSize(parseInt(e.target.value))} 
               />
@@ -514,13 +544,14 @@ function DrawingGame() {
             height={canvasSize.height}
             ref={canvasRef}
             style={{ 
-              touchAction: 'none', 
-              width: canvasSize.width + 'px', 
-              height: canvasSize.height + 'px' 
+              touchAction: 'none',
+              width: '100%',
+              height: 'auto',
+              maxWidth: '100%',
+              display: 'block'
             }}
           />
           
-          {/* Permanently visible suggestion display */}
           <div 
             id="suggestion-display" 
             className="suggestion-display permanent"
@@ -536,7 +567,7 @@ function DrawingGame() {
 
       <div className="status-bar">
         <div id="status-message" ref={statusMessageRef}>
-          Start drawing! AI will help you complete your artwork.
+          {isMobile ? "Touch and drag to draw!" : "Start drawing! AI will help you complete your artwork."}
         </div>
       </div>
     </div>
