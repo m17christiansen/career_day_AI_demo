@@ -10,6 +10,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
 .drawing-game-container header {
@@ -93,6 +94,20 @@
 .drawing-game-container .tool-group input[type="range"] {
   width: 100%;
   margin: 5px 0;
+  -webkit-appearance: none;
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  outline: none;
+}
+
+.drawing-game-container .tool-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #4facfe;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .drawing-game-container .tool-group input[type="color"] {
@@ -101,13 +116,14 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  padding: 0;
 }
 
 .drawing-game-container .tool-group button {
   background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 18px; /* Larger touch target */
   border-radius: 25px;
   cursor: pointer;
   font-weight: bold;
@@ -116,6 +132,8 @@
   min-width: 120px;
   font-family: 'Comic Sans MS', cursive, sans-serif;
   white-space: nowrap;
+  font-size: 16px; /* Larger font for mobile */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .drawing-game-container .tool-group button:hover {
@@ -128,17 +146,20 @@
 }
 
 .drawing-game-container .tool-group select {
-  padding: 8px 12px;
+  padding: 12px 15px; /* Larger padding for mobile */
   border: 1px solid #ddd;
   border-radius: 10px;
   background: white;
-  font-size: 14px;
+  font-size: 16px; /* Larger font for mobile */
   min-width: 300px;
   max-width: 100%;
   text-align: center;
   font-family: 'Comic Sans MS', cursive, sans-serif;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  -webkit-appearance: none; /* Remove default iOS styling */
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .drawing-game-container .tool-group select:hover {
@@ -157,14 +178,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  touch-action: none; /* Prevent browser touch actions */
 }
 
-/* Fixed canvas styling - remove object-fit and ensure proper sizing */
+/* Fixed canvas styling */
 .drawing-game-container #drawing-canvas {
   display: block;
   cursor: crosshair;
   background-color: white;
-  /* Remove object-fit and let the JS handle the sizing */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  touch-action: none;
 }
 
 .drawing-game-container .suggestion-display.permanent {
@@ -182,11 +208,16 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 2px solid rgba(255, 255, 255, 0.3);
   z-index: 10;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .drawing-game-container .suggestion-display.permanent:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-game-container .suggestion-display.permanent:active {
+  transform: scale(0.98);
 }
 
 .drawing-game-container .suggestion-header {
@@ -211,6 +242,7 @@
   color: #495057;
   border-top: 2px solid #dee2e6;
   flex-shrink: 0;
+  font-size: 16px; /* Larger font for mobile */
 }
 
 .drawing-game-container .status-bar #status-message {
@@ -222,26 +254,45 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 #root {
   overflow-y: auto;
 }
 
-/* Responsive design */
+/* Mobile-specific optimizations */
 @media (max-width: 768px) {
   .drawing-game-container {
       margin: 10px;
       border-radius: 15px;
+      max-width: calc(100% - 20px);
+  }
+  
+  .drawing-game-container header {
+      padding: 15px;
   }
   
   .drawing-game-container header h1 {
-      font-size: 2em;
+      font-size: 1.8em;
+  }
+  
+  .drawing-game-container header p {
+      font-size: 1em;
+  }
+  
+  .drawing-game-container .game-area {
+      padding: 15px;
+  }
+  
+  .drawing-game-container .compact-tools-panel {
+      padding: 12px;
+      margin-bottom: 15px;
   }
   
   .drawing-game-container .tool-group-row {
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
   }
   
   .drawing-game-container .tool-group.compact.button-row {
@@ -252,27 +303,38 @@ html, body, #root {
   
   .drawing-game-container .tool-group button {
       width: 100%;
-      max-width: 250px;
+      max-width: 280px;
+      padding: 14px 20px; /* Even larger on mobile */
+      font-size: 16px;
+      min-width: auto;
   }
   
   .drawing-game-container .tool-group.compact.dropdown-row {
-      min-width: 250px;
+      min-width: 100%;
   }
   
   .drawing-game-container .tool-group select {
-      min-width: 250px;
+      min-width: 100%;
       max-width: 100%;
+      padding: 14px;
+      font-size: 16px;
   }
   
   .drawing-game-container .suggestion-display.permanent {
       max-width: 200px;
-      padding: 10px;
-      bottom: 10px;
-      right: 10px;
+      padding: 12px;
+      bottom: 15px;
+      right: 15px;
+      font-size: 14px;
   }
   
   .drawing-game-container .canvas-container {
-      min-height: 300px;
+      min-height: 350px;
+  }
+  
+  .drawing-game-container .status-bar {
+      padding: 12px;
+      font-size: 14px;
   }
 }
 
@@ -282,16 +344,262 @@ html, body, #root {
   }
   
   .drawing-game-container .tool-group.compact.dropdown-row {
-      min-width: 200px;
+      min-width: 100%;
   }
   
   .drawing-game-container .tool-group select {
-      min-width: 200px;
+      min-width: 100%;
+      font-size: 15px;
   }
   
   .drawing-game-container .canvas-container {
-      min-height: 250px;
+      min-height: 300px;
+  }
+  
+  .drawing-game-container .suggestion-display.permanent {
+      max-width: 180px;
+      padding: 10px;
+      bottom: 10px;
+      right: 10px;
+      font-size: 13px;
+  }
+  
+  .drawing-game-container .tool-group button {
+      padding: 12px 16px;
+      font-size: 15px;
   }
 }
 
-/* ... rest of the CSS remains the same ... */
+/* Prevent text selection on mobile */
+* {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+/* Info Button Styles */
+.info-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.info-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.info-button:active {
+  transform: translateY(0);
+}
+
+/* Info Panel Styles */
+.info-panel {
+  position: fixed;
+  top: 0;
+  right: -60%;
+  width: 60%;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
+  z-index: 1002;
+  transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.info-panel.open {
+  right: 0;
+}
+
+.info-panel-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.info-panel-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.info-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 25px;
+  background: #f8f9fa;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.ai-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #667eea;
+}
+
+.ai-section h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.ai-section li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.ai-section strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.info-footer {
+  margin-top: 30px;
+  padding: 20px;
+  background: #e8f4fd;
+  border-radius: 12px;
+  border: 1px solid #b6d4fe;
+}
+
+.info-footer p {
+  margin: 0;
+  color: #0c5460;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Overlay */
+.info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive adjustments for info panel */
+@media (max-width: 768px) {
+  .info-panel {
+      width: 90%;
+      right: -90%;
+  }
+  
+  .info-button {
+      top: 15px;
+      right: 15px;
+      padding: 10px 16px;
+      font-size: 14px;
+  }
+  
+  .info-panel-header {
+      padding: 15px;
+  }
+  
+  .info-panel-header h2 {
+      font-size: 1.3rem;
+  }
+  
+  .ai-section {
+      padding: 15px;
+  }
+  
+  .ai-section h3 {
+      font-size: 1.1rem;
+  }
+  
+  .info-panel-content {
+      padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-panel {
+      width: 100%;
+      right: -100%;
+  }
+  
+  .info-button {
+      top: 10px;
+      right: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+  }
+  
+  .info-panel-header h2 {
+      font-size: 1.1rem;
+  }
+  
+  .ai-section {
+      padding: 12px;
+  }
+  
+  .ai-section h3 {
+      font-size: 1rem;
+  }
+}
