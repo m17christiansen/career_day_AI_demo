@@ -2,19 +2,21 @@
 .emoji-game-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Change from center to flex-start */
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
     position: relative;
+    overflow-y: auto; /* Add scrolling to wrapper */
   }
   
   .emoji-game-container {
     width: 80vw;
     max-width: 1200px;
-    height: 80vh;
-    max-height: 800px;
-    margin: 0;
+    /* REMOVED: height: 80vh, max-height: 800px */
+    height: auto; /* Changed to auto */
+    min-height: 100vh; /* Ensure it takes at least full viewport height */
+    margin: 20px 0; /* Add vertical margin */
     padding: clamp(0.5rem, 1.5vw, 1rem);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 20px;
@@ -23,7 +25,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
     box-sizing: border-box;
     position: relative;
   }
@@ -175,7 +177,7 @@
     gap: clamp(1rem, 1.5vw, 1.5rem);
     flex: 1;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
   }
   
   /* Left Sidebar - Controls and History */
@@ -194,8 +196,9 @@
     border-radius: 15px;
     padding: clamp(1rem, 1.5vw, 1.5rem);
     color: #333;
-    overflow-y: auto;
+    overflow-y: auto; /* Keep auto for internal scrolling */
     min-height: 0;
+    max-height: 70vh; /* Limit height but allow scrolling */
   }
   
   /* Right Sidebar - Instructions */
@@ -206,8 +209,9 @@
     border-radius: 15px;
     padding: clamp(1rem, 1.5vw, 1.5rem);
     color: #333;
-    overflow-y: auto;
+    overflow-y: auto; /* Keep auto for internal scrolling */
     min-height: 0;
+    max-height: 70vh; /* Limit height but allow scrolling */
   }
   
   /* Game Controls in Left Sidebar */
@@ -258,6 +262,8 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    max-height: 60vh; /* Add max-height */
+    overflow: hidden; /* Keep overflow hidden on container */
   }
   
   .history-section h3 {
@@ -271,7 +277,7 @@
     flex-direction: column;
     gap: clamp(0.2rem, 0.4vw, 0.4rem);
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Allow scrolling within history list */
   }
   
   .history-item {
@@ -415,8 +421,9 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden; /* Keep container hidden */
     min-height: 120px;
+    max-height: 200px; /* Add max-height */
   }
   
   .transcript-box h3, .sentiment-result h3 {
@@ -430,9 +437,10 @@
     font-style: italic;
     color: #555;
     line-height: 1.4;
-    overflow-y: auto;
+    overflow-y: auto; /* Add scrolling to long text */
     flex: 1;
     margin: 0;
+    padding-right: 5px; /* Add padding for scrollbar */
   }
   
   .emoji-display {
@@ -807,18 +815,21 @@
   @media (max-width: 768px) {
     .emoji-game-wrapper {
       padding: 10px;
+      align-items: flex-start; /* Ensure alignment at top */
     }
     
     .emoji-game-container {
-      width: 80vw;
-      height: 80vh;
-      padding: 0.8rem;
+      width: 95vw; /* Slightly wider on mobile */
+      height: auto;
+      min-height: auto;
+      margin: 10px 0;
     }
     
     .main-layout {
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto;
       gap: 1rem;
+      overflow: visible;
     }
     
     .left-sidebar {
@@ -832,15 +843,13 @@
     }
     
     .history-section {
-      flex: 2;
+      max-height: 40vh; /* Smaller max-height on mobile */
     }
     
-    .center-game-area {
-      order: 1;
-    }
-    
+    .center-game-area,
     .right-sidebar {
-      order: 2;
+      max-height: none; /* Remove max-height on mobile */
+      overflow: visible;
     }
     
     .info-panel {
@@ -862,9 +871,9 @@
     }
     
     .emoji-game-container {
-      width: 80vw;
-      height: 80vh;
-      padding: 0.6rem;
+      width: 98vw;
+      margin: 5px 0;
+      padding: 0.8rem;
     }
     
     .left-sidebar {
@@ -897,4 +906,35 @@
       padding: 1rem;
     }
   }
+
+/* Add scrollbar styling for all scrollable areas */
+.center-game-area::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar,
+.history-list::-webkit-scrollbar,
+.transcript-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.center-game-area::-webkit-scrollbar-track,
+.right-sidebar::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track,
+.transcript-text::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.center-game-area::-webkit-scrollbar-thumb,
+.right-sidebar::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb,
+.transcript-text::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 3px;
+}
+
+.center-game-area::-webkit-scrollbar-thumb:hover,
+.right-sidebar::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover,
+.transcript-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
   

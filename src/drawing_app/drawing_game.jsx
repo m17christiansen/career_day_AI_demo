@@ -75,15 +75,20 @@ function DrawingGame() {
     const updateCanvasSize = () => {
       const container = document.querySelector('.canvas-container');
       if (container) {
-        const maxWidth = Math.min(800, container.clientWidth - 40); // Account for padding/borders
-        const height = Math.min(500, (maxWidth * 500) / 800);
+        const maxWidth = Math.min(800, container.clientWidth - 40);
+        const height = Math.min(600, (maxWidth * 600) / 800);
         
         setCanvasSize({ width: maxWidth, height: height });
         
         const canvas = canvasRef.current;
         if (canvas) {
+          // Set the internal canvas resolution to match the display size
           canvas.width = maxWidth;
           canvas.height = height;
+          
+          // Set the display size via CSS
+          canvas.style.width = maxWidth + 'px';
+          canvas.style.height = height + 'px';
           
           // Redraw white background
           const ctx = canvas.getContext('2d');
@@ -108,14 +113,10 @@ function DrawingGame() {
     setSelectedIdea(initialIdea);
   }, []);
 
-  // Drawing functions
+  // Fixed coordinate calculation function
   const getCoordinates = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    
-    // Get the scale factor between the canvas's display size and its internal resolution
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
     
     let clientX, clientY;
     
@@ -128,8 +129,9 @@ function DrawingGame() {
     }
     
     // Calculate relative position within the canvas
-    const x = (clientX - rect.left) * scaleX;
-    const y = (clientY - rect.top) * scaleY;
+    // Use the actual canvas dimensions, not scaled coordinates
+    const x = ((clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((clientY - rect.top) / rect.height) * canvas.height;
     
     return { x, y };
   };
@@ -511,7 +513,11 @@ function DrawingGame() {
             width={canvasSize.width}
             height={canvasSize.height}
             ref={canvasRef}
-            style={{ touchAction: 'none', width: '100%', height: 'auto' }}
+            style={{ 
+              touchAction: 'none', 
+              width: canvasSize.width + 'px', 
+              height: canvasSize.height + 'px' 
+            }}
           />
           
           {/* Permanently visible suggestion display */}
